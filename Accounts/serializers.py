@@ -44,7 +44,6 @@ class RegisterSerializer(ModelSerializer):
             "email",
             "password",
             "password2",
-            "phone",
             "role",
             "last_seen",
             "created_at",
@@ -60,7 +59,6 @@ class RegisterSerializer(ModelSerializer):
         user = CustomUser.objects.create(
             username=validated_data["username"],
             email=validated_data["email"],
-            phone=validated_data.get("phone", ""),
             role=validated_data.get("role", "user"),
             last_seen=timezone.now(),
         )
