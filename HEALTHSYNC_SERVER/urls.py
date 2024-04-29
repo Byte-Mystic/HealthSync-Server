@@ -23,4 +23,5 @@ urlpatterns = [
     path("api/user/", include("Accounts.urls")),
     path("api/chat/", include("AiChat.urls")),
     path("api/oct/", include("Oct.urls")),
+    path("api/mammo/", include("MammoGraphy.urls")),
 ]

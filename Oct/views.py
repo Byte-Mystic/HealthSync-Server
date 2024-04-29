@@ -57,7 +57,7 @@ class OctImageUpload(APIView):
 
     def get(self, request):
         try:
-            recent_oct_images = Oct.objects.order_by("-created-at")
+            recent_oct_images = Oct.objects.order_by("-created_at")
             serializer = OctSerializer(recent_oct_images, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -76,7 +76,7 @@ class OctImageUpload(APIView):
         serializer = OctSerializer(data=request.data)
         image_upload_url = "https://api.imgur.com/3/image"
         headers = {
-            "Authorization": f"Client-ID {config('IMGUR_CLIENT_ID')}",
+            "Authorization": "Client-ID 5691919050247e1",
         }
         response = requests.post(
             image_upload_url, headers=headers, files={"image": img}
@@ -105,7 +105,7 @@ class RecentOctImages(APIView):
 
     def get(self, request):
         try:
-            recent_oct_images = Oct.objects.order_by("-created-at")[:3]
+            recent_oct_images = Oct.objects.order_by("-created_at")[:3]
             serializer = OctSerializer(recent_oct_images, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
