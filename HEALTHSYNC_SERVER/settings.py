@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     "Oct",
     "MammoGraphy",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "MRI",
+=======
+>>>>>>> e1f78fa651937bf961d247ab223c499974fcd450
 =======
 >>>>>>> e1f78fa651937bf961d247ab223c499974fcd450
 ]
