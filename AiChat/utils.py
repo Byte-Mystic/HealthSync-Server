@@ -1,8 +1,3 @@
-from openai import OpenAI
-
-client = OpenAI(api_key="API KEY")
-
-
 def chat_with_me(question: str) -> str | None:
     # try:
     #     chat_completion = client.chat.completions.create(

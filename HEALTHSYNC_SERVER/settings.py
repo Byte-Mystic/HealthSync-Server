@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     "Accounts",
     "AiChat",
     "Oct",
+    "MammoGraphy",
+<<<<<<< HEAD
+    "MRI",
+=======
+>>>>>>> e1f78fa651937bf961d247ab223c499974fcd450
 ]
 
 REST_FRAMEWORK = {

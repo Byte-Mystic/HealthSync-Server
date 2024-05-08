@@ -1,6 +1,5 @@
 import os
 
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import requests
 import copy
 from .serializers import OctSerializer
@@ -11,19 +10,20 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from keras import backend as k
+import tensorflow as tf
 import cv2
-from keras.api.models import load_model
 import numpy as np
 
+# os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(script_dir, "DenseNet121.hdf5")
-# model = load_model(model_path)
+model = tf.keras.models.load_model(model_path)
 
 JWT_authenticator = JWTAuthentication()
 
 
-def OCTPrediction(uploaded_image):
+def OCTPrediction(uploaded_image, model):
     """
     This function includes entire pipeline, from data preprocessing to making final predictions.
     Input: Image
@@ -32,7 +32,10 @@ def OCTPrediction(uploaded_image):
     try:
         file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, 1)
-        image = cv2.resize(image, (244, 244))
+        image = cv2.resize(image, (224, 224))
+        if image is None:
+            print("ERROR: Failed to decode image")
+            return
         image = image.astype(np.float32)
         image = image / 255.0
         image = np.expand_dims(image, axis=0)
@@ -47,6 +50,7 @@ def OCTPrediction(uploaded_image):
         k.clear_session()
         return predicted_class_label
     except Exception as e:
+        print(f"ERROR: {e}")
         return Response(
             {"error": f"Error in Prediction {e}"}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -57,7 +61,7 @@ class OctImageUpload(APIView):
 
     def get(self, request):
         try:
-            recent_oct_images = Oct.objects.order_by("-created-at")
+            recent_oct_images = Oct.objects.order_by("-created_at")
             serializer = OctSerializer(recent_oct_images, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -65,8 +69,11 @@ class OctImageUpload(APIView):
 
     def post(self, request):
         img = request.data["image"]
-        prediction = OCTPrediction(copy.deepcopy(img))
+
+        prediction = OCTPrediction(copy.deepcopy(img), model)
+        print(prediction)
         response = JWT_authenticator.authenticate(request)
+        print(f"LINE 79: {response}")
         if response is None:
             return Response(
                 {"error": "User Not Found."}, status=status.HTTP_401_UNAUTHORIZED
@@ -76,7 +83,7 @@ class OctImageUpload(APIView):
         serializer = OctSerializer(data=request.data)
         image_upload_url = "https://api.imgur.com/3/image"
         headers = {
-            "Authorization": f"Client-ID {config('IMGUR_CLIENT_ID')}",
+            "Authorization": "Client-ID 5691919050247e1",
         }
         response = requests.post(
             image_upload_url, headers=headers, files={"image": img}
@@ -87,6 +94,7 @@ class OctImageUpload(APIView):
             imgur_url: str = imgur_data["data"]["link"]
             data = {"image": imgur_url, "patient_id": patient.pk, "result": prediction}
             serializer = OctSerializer(data=data)
+            print(f"LINE 100: {data}")
             if serializer.is_valid():
                 oct = Oct(**serializer.validated_data)  # type: ignore
                 oct.save()
@@ -105,7 +113,7 @@ class RecentOctImages(APIView):
 
     def get(self, request):
         try:
-            recent_oct_images = Oct.objects.order_by("-created-at")[:3]
+            recent_oct_images = Oct.objects.order_by("-created_at")[:3]
             serializer = OctSerializer(recent_oct_images, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
