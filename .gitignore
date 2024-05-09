@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 /Oct/DenseNet121.hdf5
 MammoGraphy/Resnet_fineTuning.pth
+/MRI/mri.h5

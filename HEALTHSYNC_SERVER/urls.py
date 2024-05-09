@@ -24,11 +24,5 @@ urlpatterns = [
     path("api/chat/", include("AiChat.urls")),
     path("api/oct/", include("Oct.urls")),
     path("api/mammo/", include("MammoGraphy.urls")),
-<<<<<<< HEAD
-<<<<<<< HEAD
     path("api/mri/", include("MRI.urls")),
-=======
->>>>>>> e1f78fa651937bf961d247ab223c499974fcd450
-=======
->>>>>>> e1f78fa651937bf961d247ab223c499974fcd450
 ]
